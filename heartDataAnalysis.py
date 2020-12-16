@@ -10,7 +10,10 @@ import os
 import pandas as pd
 import numpy as np
 
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn import metrics
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
@@ -36,12 +39,22 @@ filename_read = os.path.join(path, "heart.csv")
 df = pd.read_csv(filename_read)
 df - df.reindex(np.random.permutation(df.index))
 
-#get X and y values
-X = df.drop('target', axis=1)
-y = df.target.values
-
 #columns to plot on the confusion matrix
+df.columns = ['age', 'sex',	'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope',	'ca', 'thal', 'target']
 cols = ['age', 'sex']
+
+#Encode the feature values which are strings to integers
+for label in df.columns:
+    df[label] = LabelEncoder().fit(df[label]).transform(df[label])
+
+# Create our X and y data    
+result = []
+for x in df.columns:
+    if x != 'target':
+        result.append(x)
+
+X = df[result].values
+y = df['target'].values
 
 #split the dataset
 X_train, X_test, y_train, y_test = train_test_split(    
@@ -51,6 +64,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 knn = KNeighborsClassifier()
 knn.fit(X_train, y_train) 
 
+#make predictions
 y_pred = knn.predict(X_test)
 
 #print results
@@ -71,3 +85,8 @@ print(cm_normalized)
 plt.figure()
 plot_confusion_matrix(cm_normalized, cols, title='Normalized confusion matrix')
 plt.show()
+
+#build a new data frame with two columns, the actual values of the test data, 
+#and the predictions of the model
+df_compare = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+df_head = df_compare.head(25)
