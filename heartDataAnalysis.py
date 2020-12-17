@@ -10,13 +10,14 @@ import os
 import pandas as pd
 import numpy as np
 
+from sklearn import metrics
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn import metrics
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 
 import matplotlib.pyplot as plt
 
@@ -58,20 +59,26 @@ y = df['target'].values
 
 #split the dataset
 X_train, X_test, y_train, y_test = train_test_split(    
-    X, y, test_size=0.2, random_state=9) 
+    X, y, test_size=0.2)
 
 #build a knn model
-knn = KNeighborsClassifier()
+knn = KNeighborsClassifier(n_neighbors=16)
 knn.fit(X_train, y_train) 
 
+#Instantiate the model with 10 trees and entropy as splitting criteria
+rf = RandomForestClassifier()
+rf.fit(X_train, y_train)
+
 #make predictions
-y_pred = knn.predict(X_test)
+y_pred_knn = knn.predict(X_test)
+y_pred_rf = rf.predict(X_test)
 
 #print results
-print('kNN Accuracy: %.3f' % accuracy_score(y_test, y_pred))
+print('kNN Accuracy: %.3f' % accuracy_score(y_test, y_pred_knn))
+print('Random Forest Accuracy: %.3f' % accuracy_score(y_test, y_pred_rf))
 
 #print confusion matrix numerically, using library method
-cm = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred_knn)
 np.set_printoptions(precision=2)
 print('Confusion matrix, without normalization')
 print(cm)
@@ -86,7 +93,6 @@ plt.figure()
 plot_confusion_matrix(cm_normalized, cols, title='Normalized confusion matrix')
 plt.show()
 
-#build a new data frame with two columns, the actual values of the test data, 
+#build a new data frame with three columns, the actual values of the test data, 
 #and the predictions of the model
-df_compare = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
-df_head = df_compare.head(25)
+df_compare = pd.DataFrame({'Actual': y_test, 'Predicted (kNN)': y_pred_knn, 'Predicted (RF)': y_pred_rf})
