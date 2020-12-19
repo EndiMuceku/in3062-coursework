@@ -62,11 +62,11 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2)
 
 #build a knn model
-knn = KNeighborsClassifier(n_neighbors=16)
+knn = KNeighborsClassifier(n_neighbors=52, weights='uniform')
 knn.fit(X_train, y_train) 
 
 #Instantiate the model with 10 trees and entropy as splitting criteria
-rf = RandomForestClassifier()
+rf = RandomForestClassifier(n_estimators = 40)
 rf.fit(X_train, y_train)
 
 #make predictions
