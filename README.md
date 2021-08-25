@@ -1,4 +1,4 @@
-# in3062-coursework
+# in3062-coursework-with-jinkato
 ### IN3062 Introduction to Artificial Intelligence Coursework Repository
 
 
